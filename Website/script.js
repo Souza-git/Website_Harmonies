@@ -2,7 +2,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // Configuração com as suas credenciais
-const supabaseUrl = 'https://supabase.com/dashboard/project/dmbllbcvqgqljegnnhrs'; // URL base sem o /rest/v1/
+const supabaseUrl = 'https://dmbllbcvqgqljegnnhrs.supabase.co'; // URL base sem o /rest/v1/
 const supabaseKey = 'sb_publishable_NLHeKZASaezelW9QOY6q-g_ZB5UgBPx';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
