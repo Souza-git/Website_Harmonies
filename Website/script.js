@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const playersContainer = document.getElementById('players-container');
     const btnAddPlayer = document.getElementById('btn-add-player');
-    
+
     if (playersContainer && btnAddPlayer) {
         let playerCount = 0;
         const maxPlayers = 4; // Limite oficial de jogadores
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function addPlayerBlock() {
             if (playerCount >= maxPlayers) return;
             playerCount++;
-            
+
             const playerDiv = document.createElement('div');
             playerDiv.className = 'player-section';
             playerDiv.innerHTML = `
@@ -36,10 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label>Espírito da Natureza:</label>
                         <select class="player-spirit">
                             <option value="Nenhum">Nenhum</option>
-                            <option value="Espirito 1">Espirito 1</option>
-                            <option value="Espirito 2">Espirito 2</option>
-                            <option value="Espirito 3">Espirito 3</option>
-                            <option value="Espirito 4">Espirito 4</option>
+                            <option value="Espírito do Leão">Espírito do Leão</option>
+                            <option value="Espírito da Tartaruga">Espírito da Tartaruga</option>
+                            <option value="Espírito do Urso">Espírito do Urso</option>
+                            <option value="Espírito do Lobo">Espírito do Lobo</option>
+                            <option value="Espírito da Coruja">Espírito da Coruja</option>
+                            <option value="Espírito do Rinoceronte">Espírito do Rinoceronte</option>
+                            <option value="Espírito do Elefante">Espírito do Elefante</option>
+                            <option value="Espírito da Águia">Espírito da Águia</option>
+                            <option value="Espírito do Cervo">Espírito do Cervo</option>
+                            <option value="Espírito do Leopardo">Espírito do Leopardo</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -60,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Inicializa com 2 jogadores
-        addPlayerBlock(); 
-        addPlayerBlock(); 
+        addPlayerBlock();
+        addPlayerBlock();
         btnAddPlayer.addEventListener('click', addPlayerBlock);
     }
 
@@ -93,8 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Passo B: Criar Partida
-                const { data: partida, error: errPartida } = await supabase.from('partidas').insert([{ 
-                    data_partida: dataPartida, modo_jogo: 'Solo', lado_tabuleiro: lado 
+                const { data: partida, error: errPartida } = await supabase.from('partidas').insert([{
+                    data_partida: dataPartida, modo_jogo: 'Solo', lado_tabuleiro: lado
                 }]).select().single();
                 if (errPartida) throw errPartida;
 
@@ -104,9 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     jogador_id: jogador.id,
                     espirito_natureza: espirito,
                     pontos: pontos,
-                    cubos_animal: 0, 
+                    cubos_animal: 0,
                     sois: sois,
-                    vencedor: true 
+                    vencedor: true
                 }]);
                 if (errRegistro) throw errRegistro;
 
@@ -135,11 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dataPartida = document.getElementById('data-partida-multi').value;
             const lado = document.querySelector('input[name="lado_tabuleiro_multi"]:checked').value;
-            
+
             // Coletar dados da tela
             const sections = document.querySelectorAll('.player-section');
             let jogadoresDados = [];
-            
+
             sections.forEach(section => {
                 jogadoresDados.push({
                     nome: section.querySelector('.player-name').value,
@@ -171,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Passo A: Criar a Partida
-                const { data: partida, error: errPartida } = await supabase.from('partidas').insert([{ 
-                    data_partida: dataPartida, modo_jogo: 'Grupo', lado_tabuleiro: lado 
+                const { data: partida, error: errPartida } = await supabase.from('partidas').insert([{
+                    data_partida: dataPartida, modo_jogo: 'Grupo', lado_tabuleiro: lado
                 }]).select().single();
                 if (errPartida) throw errPartida;
 
@@ -220,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (historicoContainer) {
         async function carregarHistorico() {
             historicoContainer.innerHTML = "<p style='text-align:center;'>Buscando partidas no banco de dados...</p>";
-            
+
             // Faz um Join entre Partidas, Registros e Jogadores usando a sintaxe do Supabase
             const { data: partidas, error } = await supabase
                 .from('partidas')
@@ -278,5 +284,108 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         carregarHistorico();
+    }
+
+    // ==========================================
+    // 5. LÓGICA DA ABA DE ESTATÍSTICAS / RANKING
+    // ==========================================
+    const estatisticasContainer = document.getElementById('estatisticas-page');
+
+    if (estatisticasContainer) {
+        async function carregarEstatisticas() {
+            const divHall = document.getElementById('hall-fama');
+            const divRecorde = document.getElementById('recorde');
+            const divEspirito = document.getElementById('espirito-fav');
+
+            // Busca os registros e junta com as tabelas Jogadores e Partidas
+            const { data: registros, error } = await supabase
+                .from('registros_partida')
+                .select(`
+                    pontos, vencedor, espirito_natureza,
+                    jogadores ( nome ),
+                    partidas!inner ( modo_jogo )
+                `);
+
+            if (error) {
+                console.error("Erro ao buscar estatísticas:", error);
+                divHall.innerHTML = `<p style="color:red;">Erro ao buscar dados do Supabase.</p>`;
+                return;
+            }
+
+            if (!registros || registros.length === 0) {
+                const msgVazia = "<p style='color:#666;'>Jogue sua primeira partida para gerar estatísticas!</p>";
+                divHall.innerHTML = msgVazia;
+                divRecorde.innerHTML = msgVazia;
+                divEspirito.innerHTML = msgVazia;
+                return;
+            }
+
+            // Variáveis para calcularmos os totais
+            let vitorias = {};
+            let maxPontos = { pontos: -1, jogador: '', modo: '' };
+            let espiritos = {};
+
+            registros.forEach(r => {
+                // 1. Contagem de Vitórias (Ignora partidas Solo, conta apenas modo Grupo)
+                if (r.vencedor && r.partidas.modo_jogo === 'Grupo') {
+                    const nome = r.jogadores.nome;
+                    vitorias[nome] = (vitorias[nome] || 0) + 1;
+                }
+
+                // 2. Maior Pontuação Absoluta
+                if (r.pontos > maxPontos.pontos) {
+                    maxPontos = { pontos: r.pontos, jogador: r.jogadores.nome, modo: r.partidas.modo_jogo };
+                }
+
+                // 3. Espírito Favorito (Ignora os que escolheram 'Nenhum')
+                if (r.espirito_natureza && r.espirito_natureza !== 'Nenhum') {
+                    const esp = r.espirito_natureza;
+                    espiritos[esp] = (espiritos[esp] || 0) + 1;
+                }
+            });
+
+            // --- RENDERIZAR HALL DA FAMA ---
+            // Transforma o objeto em um Array e ordena quem tem mais vitórias no topo
+            const rankingVitorias = Object.entries(vitorias).sort((a, b) => b[3] - a[3]);
+
+            if (rankingVitorias.length > 0) {
+                let htmlHall = "";
+                rankingVitorias.forEach((v, index) => {
+                    let medalha = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                    htmlHall += `
+                        <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <span style="font-size: 1.1em;">${medalha} <b>${v}</b></span>
+                            <span style="color: var(--primary-color); font-weight: bold;">${v[3]} Vitória(s)</span>
+                        </div>
+                    `;
+                });
+                divHall.innerHTML = htmlHall;
+            } else {
+                divHall.innerHTML = "<p style='color:#666;'>Nenhuma vitória em grupo registrada.</p>";
+            }
+
+            // --- RENDERIZAR RECORDE ---
+            if (maxPontos.pontos > -1) {
+                divRecorde.innerHTML = `
+                    <div style="font-size: 2.5em; color: var(--primary-color); margin-bottom: 5px;"><b>${maxPontos.pontos}</b></div>
+                    <div style="font-size: 1.1em;">Feito por <b>${maxPontos.jogador}</b></div>
+                    <div style="color: #666; font-size: 0.9em;">(Em uma partida ${maxPontos.modo})</div>
+                `;
+            }
+
+            // --- RENDERIZAR ESPÍRITO ---
+            const rankingEspiritos = Object.entries(espiritos).sort((a, b) => b[3] - a[3]);
+            if (rankingEspiritos.length > 0) {
+                const espiritoTop = rankingEspiritos;
+                divEspirito.innerHTML = `
+                    <div style="font-size: 1.5em; color: var(--secondary-color); margin-bottom: 5px;"><b>${espiritoTop}</b></div>
+                    <div style="color: #666;">Escolhido ${espiritoTop[3]} vez(es) na sua mesa</div>
+                `;
+            } else {
+                divEspirito.innerHTML = "<p style='color:#666;'>A variante de Espíritos da Natureza ainda não foi utilizada.</p>";
+            }
+        }
+
+        carregarEstatisticas();
     }
 });
