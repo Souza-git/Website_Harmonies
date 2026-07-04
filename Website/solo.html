@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modo Solo - Harmonies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="back-link">← Voltar ao Início</a>
+        <h1>👤 Registro: Modo Solo</h1>
+    </header>
+
+    <form id="solo-form">
+        <section class="card">
+            <h2>Configurações da Partida</h2>
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label for="data-partida">Data da Partida:</label>
+                    <input type="date" id="data-partida" required>
+                </div>
+                <div class="form-group">
+                    <label>Lado do Tabuleiro:</label>
+                    <div class="radio-group">
+                        <input type="radio" id="lado-a" name="lado_tabuleiro" value="A" checked>
+                        <label for="lado-a">Lado A (Rios)</label>
+                        
+                        <input type="radio" id="lado-b" name="lado_tabuleiro" value="B">
+                        <label for="lado-b">Lado B (Ilhas)</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Seu Desempenho</h2>
+            <div class="form-group">
+                <label for="nome-j1">Nome do Jogador:</label>
+                <input type="text" id="nome-j1" placeholder="Seu Nome" required>
+            </div>
+            <div class="form-group">
+                <label for="espirito-j1">Espírito da Natureza Utilizado:</label>
+                <select id="espirito-j1">
+                    <option value="Nenhum">Nenhum</option>
+                    <option value="Espirito 1">Espirito 1</option>
+                    <option value="Espirito 2">Espirito 2</option>
+                    <option value="Espirito 3">Espirito 3</option>
+                    <option value="Espirito 4">Espirito 4</option>
+                </select>
+            </div>
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label for="pontos-j1">Pontuação Final:</label>
+                    <input type="number" id="pontos-j1" placeholder="Ex: 116" required>
+                </div>
+                <div class="form-group">
+                    <label for="sois-j1">Sóis Conquistados ⭐:</label>
+                    <input type="number" id="sois-j1" placeholder="Ex: 3" required>
+                </div>
+            </div>
+        </section>
+
+        <button type="submit" class="btn-submit">Salvar Partida Solo</button>
+    </form>
+</div>
+
+<!-- CORREÇÃO APLICADA AQUI: type="module" -->
+<script type="module" src="script.js"></script>
+</body>
+</html>

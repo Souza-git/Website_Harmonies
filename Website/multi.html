@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modo em Grupo - Harmonies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="back-link">← Voltar ao Início</a>
+        <h1>👥 Registro: Em Grupo</h1>
+    </header>
+
+    <form id="multi-form">
+        <section class="card">
+            <h2>Configurações Comuns</h2>
+            <p class="hint">Segundo a regra, todos devem jogar com o mesmo lado do tabuleiro pessoal.</p>
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label for="data-partida-multi">Data da Partida:</label>
+                    <input type="date" id="data-partida-multi" required>
+                </div>
+                <div class="form-group">
+                    <label>Lado do Tabuleiro:</label>
+                    <div class="radio-group">
+                        <input type="radio" id="multi-lado-a" name="lado_tabuleiro_multi" value="A" checked>
+                        <label for="multi-lado-a">Lado A (Rios)</label>
+                        
+                        <input type="radio" id="multi-lado-b" name="lado_tabuleiro_multi" value="B">
+                        <label for="multi-lado-b">Lado B (Ilhas)</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="flex-between">
+                <h2>Jogadores</h2>
+                <button type="button" id="btn-add-player" class="btn-secondary">+ Adicionar Jogador</button>
+            </div>
+            <p class="hint">O jogo suporta no máximo 4 jogadores na mesa.</p>
+            
+            <div id="players-container">
+                <!-- Os jogadores serão inseridos aqui pelo JavaScript -->
+            </div>
+        </section>
+
+        <button type="submit" class="btn-submit">Salvar Partida em Grupo</button>
+    </form>
+</div>
+
+<!-- CORREÇÃO APLICADA AQUI: type="module" -->
+<script type="module" src="script.js"></script>
+</body>
+</html>
