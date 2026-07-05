@@ -35,17 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group">
                         <label>Espírito da Natureza:</label>
                         <select class="player-spirit">
-                            <option value="Nenhum">Nenhum</option>
-                            <option value="Espírito do Leão">Espírito do Leão</option>
-                            <option value="Espírito da Tartaruga">Espírito da Tartaruga</option>
-                            <option value="Espírito do Urso">Espírito do Urso</option>
-                            <option value="Espírito do Lobo">Espírito do Lobo</option>
-                            <option value="Espírito da Coruja">Espírito da Coruja</option>
-                            <option value="Espírito do Rinoceronte">Espírito do Rinoceronte</option>
-                            <option value="Espírito do Elefante">Espírito do Elefante</option>
-                            <option value="Espírito da Águia">Espírito da Águia</option>
-                            <option value="Espírito do Cervo">Espírito do Cervo</option>
-                            <option value="Espírito do Leopardo">Espírito do Leopardo</option>
+                            <option value="Nenhum">Nenhum (Variante não utilizada)</option>
+                        <option value="Espírito do Leão">Espírito do Leão</option>
+                        <option value="Espírito da Tartaruga">Espírito da Tartaruga</option>
+                        <option value="Espírito do Bode">Espírito do Bode</option>
+                        <option value="Espírito do Gato">Espírito do Gato</option>
+                        <option value="Espírito da Coruja">Espírito da Coruja</option>
+                        <option value="Espírito da Borboleta">Espírito da Borboleta</option>
+                        <option value="Espírito da Garça">Espírito da Garça</option>
+                        <option value="Espírito da Libelula">Espírito da Libélula</option>
+                        <option value="Espírito do Cervo">Espírito do Cervo</option>
+                        <option value="Espírito do Castor">Espírito do Castor</option>
                         </select>
                     </div>
                     <div class="form-group">
