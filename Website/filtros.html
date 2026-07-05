@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar Estatísticas - Harmonies</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container" id="filtros-page">
+        <header>
+            <a href="index.html" class="back-link">← Voltar ao Início</a>
+            <h1>🔍 Explorar Estatísticas</h1>
+            <p>Encontre os recordes de qualquer jogador ou espírito</p>
+        </header>
+
+        <section class="card">
+            <h2>Escolha os Filtros</h2>
+            <div class="grid-2-col">
+                <div class="form-group">
+                    <label for="filtro-jogador">Filtrar por Jogador:</label>
+                    <select id="filtro-jogador">
+                        <option value="Todos">Todos os Jogadores</option>
+                        <!-- Os nomes dos jogadores serão puxados do banco de dados aqui -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filtro-espirito">Filtrar por Espírito da Natureza:</label>
+                    <select id="filtro-espirito">
+                        <option value="Todos">Todos os Espíritos</option>
+                        <option value="Nenhum">Nenhum</option>
+                        <option value="Espírito do Leão">Espírito do Leão</option>
+                        <option value="Espírito da Tartaruga">Espírito da Tartaruga</option>
+                        <option value="Espírito do Bode">Espírito do Bode</option>
+                        <option value="Espírito do Gato">Espírito do Gato</option>
+                        <option value="Espírito da Coruja">Espírito da Coruja</option>
+                        <option value="Espírito da Borboleta">Espírito da Borboleta</option>
+                        <option value="Espírito da Garça">Espírito da Garça</option>
+                        <option value="Espírito da Libelula">Espírito da Libélula</option>
+                        <option value="Espírito do Cervo">Espírito do Cervo</option>
+                        <option value="Espírito do Castor">Espírito do Castor</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" id="btn-buscar" class="btn-submit" style="margin-top: 10px;">Aplicar Filtros</button>
+        </section>
+
+        <!-- Onde o JavaScript vai injetar o Resumo do Filtro -->
+        <div id="resumo-filtros" style="margin-bottom: 20px;"></div>
+
+        <!-- Onde o JavaScript vai listar as partidas filtradas -->
+        <div id="resultados-filtros"></div>
+
+    </div>
+
+    <!-- O Type="module" é essencial para rodar o Supabase -->
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

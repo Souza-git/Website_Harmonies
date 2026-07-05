@@ -354,8 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     let medalha = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
                     htmlHall += `
                         <div class="flex-between" style="padding: 8px 0; border-bottom: 1px solid #eee;">
-                            <span style="font-size: 1.1em;">${medalha} <b>${v}</b></span>
-                            <span style="color: var(--primary-color); font-weight: bold;">${v[3]} Vitória(s)</span>
+                            <span style="font-size: 1.1em;">${medalha} <b>${v[0]}</b></span>
+                            <span style="color: var(--primary-color); font-weight: bold;">${v[1]} Vitória(s)</span>
                         </div>
                     `;
                 });
@@ -378,8 +378,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rankingEspiritos.length > 0) {
                 const espiritoTop = rankingEspiritos;
                 divEspirito.innerHTML = `
-                    <div style="font-size: 1.5em; color: var(--secondary-color); margin-bottom: 5px;"><b>${espiritoTop}</b></div>
-                    <div style="color: #666;">Escolhido ${espiritoTop[3]} vez(es) na sua mesa</div>
+                    <div style="font-size: 1.5em; color: var(--secondary-color); margin-bottom: 5px;"><b>${espiritoTop[0]}</b></div>
+                    <div style="color: #666;">Escolhido ${espiritoTop[0]} vez(es) na sua mesa</div>
                 `;
             } else {
                 divEspirito.innerHTML = "<p style='color:#666;'>A variante de Espíritos da Natureza ainda não foi utilizada.</p>";
@@ -387,5 +387,146 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         carregarEstatisticas();
+    }
+
+    // ==========================================
+    // 6. LÓGICA DA ABA EXPLORAR / FILTROS PÚBLICOS
+    // ==========================================
+    const filtrosContainer = document.getElementById('filtros-page');
+
+    if (filtrosContainer) {
+        const selectJogador = document.getElementById('filtro-jogador');
+        const selectEspirito = document.getElementById('filtro-espirito');
+        const btnBuscar = document.getElementById('btn-buscar');
+        const divResumo = document.getElementById('resumo-filtros');
+        const divResultados = document.getElementById('resultados-filtros');
+
+        // Carregar a lista de jogadores do banco de dados para o Select
+        async function carregarJogadores() {
+            const { data: jogadores, error } = await supabase
+                .from('jogadores')
+                .select('nome')
+                .order('nome');
+
+            if (!error && jogadores) {
+                jogadores.forEach(j => {
+                    const option = document.createElement('option');
+                    option.value = j.nome;
+                    option.textContent = j.nome;
+                    selectJogador.appendChild(option);
+                });
+            }
+        }
+        carregarJogadores();
+
+        // Executar a busca quando clicar no botão
+        btnBuscar.addEventListener('click', async () => {
+            const jogadorFiltro = selectJogador.value;
+            const espiritoFiltro = selectEspirito.value;
+
+            divResumo.innerHTML = "<p style='text-align:center;'>Calculando estatísticas...</p>";
+            divResultados.innerHTML = "";
+
+            // CORREÇÃO: Adicionamos o 'partida_id' na nossa busca
+            const { data: registros, error } = await supabase
+                .from('registros_partida')
+                .select(`
+                    partida_id,
+                    pontos, vencedor, espirito_natureza, cubos_animal, sois,
+                    jogadores ( nome ),
+                    partidas ( data_partida, modo_jogo, lado_tabuleiro )
+                `)
+                .order('pontos', { ascending: false });
+
+            if (error) {
+                divResumo.innerHTML = `<p style="color:red;">Erro ao buscar dados: ${error.message}</p>`;
+                return;
+            }
+
+            let filtrados = registros;
+
+            if (jogadorFiltro !== 'Todos') {
+                filtrados = filtrados.filter(r => r.jogadores.nome === jogadorFiltro);
+            }
+
+            if (espiritoFiltro !== 'Todos') {
+                filtrados = filtrados.filter(r => r.espirito_natureza === espiritoFiltro);
+            }
+
+            if (filtrados.length === 0) {
+                divResumo.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma partida encontrada com esta combinação.</p>";
+                return;
+            }
+
+            // ==========================================
+            // CÁLCULO DE ESTATÍSTICAS CORRIGIDO
+            // ==========================================
+
+            /// 1. Número de Participações vs Número de Partidas Únicas
+            const totalParticipacoes = filtrados.length;
+
+            // Cria um conjunto de IDs únicos. Se 3 jogadores jogaram a mesma partida_id, ela contará apenas como 1.
+            const idsPartidasUnicas = new Set(filtrados.map(r => r.partida_id));
+            const totalPartidas = idsPartidasUnicas.size;
+
+            const vitorias = filtrados.filter(r => r.vencedor && r.partidas.modo_jogo === 'Grupo').length;
+
+            // CORREÇÃO: Pega os pontos do primeiro item  da lista filtrada (que é a maior nota graças à ordenação do banco)
+            const maiorPontuacao = Math.max(...filtrados.map(r => r.pontos));
+
+            // A média de pontos deve ser dividida pelo número de vezes que a pessoa jogou (participações)
+            const somaTotal = filtrados.reduce((acumulador, r) => acumulador + r.pontos, 0);
+            const mediaPontos = Math.round(somaTotal / totalParticipacoes);
+
+            // ==========================================
+            // EXIBIR RESUMO NO TOPO
+            // ==========================================
+            divResumo.innerHTML = `
+                <div class="grid-2-col" style="text-align: center; gap: 15px;">
+                    <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid var(--primary-color);">
+                        <h3 style="color: var(--primary-color); font-size: 2.5em; margin-bottom: 0;">${maiorPontuacao}</h3>
+                        <p style="font-weight: bold; color: var(--text-color);">Recorde (Filtro Atual)</p>
+                    </div>
+                    <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid #ccc;">
+                        <h3 style="color: var(--secondary-color); font-size: 2em; margin-bottom: 0;">${mediaPontos}</h3>
+                        <p style="color: var(--text-color);">Média de Pontos</p>
+                    </div>
+                    <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid #ccc;">
+                        <h3 style="color: var(--secondary-color); font-size: 2em; margin-bottom: 0;">${totalPartidas}</h3>
+                        <p style="color: var(--text-color);">Partidas (Jogos Únicos)</p>
+                    </div>
+                    <div style="background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid #ccc;">
+                        <h3 style="color: var(--secondary-color); font-size: 2em; margin-bottom: 0;">${vitorias}</h3>
+                        <p style="color: var(--text-color);">Vitórias em Grupo</p>
+                    </div>
+                </div>
+            `;
+
+            // ==========================================
+            // EXIBIR A LISTA DAS PARTIDAS ABAIXO
+            // ==========================================
+            filtrados.forEach((r, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.padding = '15px';
+                card.style.marginBottom = '10px';
+
+                let dataFormatada = r.partidas.data_partida.split('-').reverse().join('/');
+
+                card.innerHTML = `
+                    <div class="flex-between">
+                        <strong>${index + 1}º Melhor - ${r.jogadores.nome}</strong>
+                        <span style="font-size: 0.9em; color: #666;">📅 ${dataFormatada}</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        🏆 <b>${r.pontos} pts</b> | Lado: ${r.partidas.lado_tabuleiro} | Modo: ${r.partidas.modo_jogo}
+                        <br>🌿 Espírito: ${r.espirito_natureza}
+                        ${r.sois ? ` | ⭐ ${r.sois} Sóis` : ''}
+                        ${r.vencedor && r.partidas.modo_jogo === 'Grupo' ? '<br><span style="color: var(--primary-color);">👑 <b>Vencedor da Partida</b></span>' : ''}
+                    </div>
+                `;
+                divResultados.appendChild(card);
+            });
+        });
     }
 });
